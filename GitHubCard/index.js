@@ -35,19 +35,48 @@ axios.get("https://api.github.com/users/ClydeFrog04")
           user, and adding that card to the DOM.
 */
 
-const cards = document.querySelector(".cards");
-const friendsArray = ["ClydeFrog04", "tetondan", "dustinmyers", "justsml", "luishrd", "bigknell"];
-friendsArray.forEach((friend) => {
-    const url = "https://api.github.com/users/" + friend;
-    axios.get(url)
-        .then((response) => {
-            cards.appendChild(card(response));
-        })
-        .catch((err) => {
-            console.log(err);
+//manually creating friends
+// const cards = document.querySelector(".cards");
+// const friendsArray = ["ClydeFrog04", "tetondan", "dustinmyers", "justsml", "luishrd", "bigknell"];
+// friendsArray.forEach((friend) => {
+//     const url = "https://api.github.com/users/" + friend;
+//     axios.get(url)
+//         .then((response) => {
+//             console.log(response);
+//             cards.appendChild(card(response));
+//         })
+//         .catch((err) => {
+//             console.log(err);
+//
+//         });
+// });
 
+
+//instead of a foreach, it will be just my request again, then the next promise will be to create my followers
+//programmatically doing it
+const cards = document.querySelector(".cards");
+axios.get("https://api.github.com/users/ClydeFrog04")
+    .then((response) => {
+        console.log("Data back", response);
+        cards.appendChild(card(response));
+        return axios.get(response.data.followers_url);
+    })
+    .then((response) =>{
+        console.log("follower response data: ", response.data);
+        response.data.forEach((follower) =>{
+            console.log(follower.url);
+            //cards.appendChild(card(axios.get(follower.url)));
+            axios.get(follower.url)
+                .then((response) =>{
+                    cards.appendChild(card(response));
+                })
+                .catch(err => {console.log(err)});
         });
-});
+    })
+    .catch((err) => {
+        console.log(err);
+
+    });
 
 function card(props) {
     //declare/initialize elements
